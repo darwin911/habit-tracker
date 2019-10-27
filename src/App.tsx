@@ -1,10 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './scss/App.css';
+import 'semantic-ui-css/semantic.min.css';
+import { Login } from './components/Login';
+
+import { TrackerContainer } from './components/TrackerContainer';
 
 const App: React.FC = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   return (
     <div className='App'>
-      <h1>Habit Tracker</h1>
+      {isLoggedIn ? (
+        <TrackerContainer entries={[]} />
+      ) : (
+        <Login setIsLoggedIn={setIsLoggedIn} />
+      )}
     </div>
   );
 };
