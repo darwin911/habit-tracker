@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './scss/App.css';
+import './scss/style.css';
 import 'semantic-ui-css/semantic.min.css';
 import { Login } from './components/Login';
 
@@ -10,7 +10,7 @@ const App: React.FC = () => {
   return (
     <div className='App'>
       {isLoggedIn ? (
-        <TrackerContainer entries={[]} />
+        <TrackerContainer />
       ) : (
         <Login setIsLoggedIn={setIsLoggedIn} />
       )}
