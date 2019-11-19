@@ -77,7 +77,7 @@ export const TrackerContainer: React.FC<Props> = () => {
   };
 
   return (
-    <div style={{ maxWidth: 300, margin: '0 auto' }}>
+    <div style={{ maxWidth: 600, margin: '0 auto' }}>
       <h1>Hi Darwin!</h1>
       <h2>Today's entry: </h2>
       <Button.Group fluid>
@@ -85,18 +85,27 @@ export const TrackerContainer: React.FC<Props> = () => {
           <Button.Content visible>Leave Home</Button.Content>
           <Button.Content hidden>{moment().format('hh:mm a')}</Button.Content>
         </Button>
-        <Button icon color='green'>
+        <Button icon>
           <Icon name='home' />
         </Button>
-        <Button onClick={() => addEntry('ARRIVE_HOME')}>Arrive Home</Button>
+        <Button onClick={() => addEntry('ARRIVE_HOME')} animated='fade'>
+          <Button.Content visible>Arrive Home</Button.Content>
+          <Button.Content hidden>{moment().format('hh:mm a')}</Button.Content>
+        </Button>
       </Button.Group>
       <Divider />
       <Button.Group fluid>
-        <Button onClick={() => addEntry('ARRIVE_WORK')}>Arrive Work</Button>
-        <Button icon color='blue'>
+        <Button onClick={() => addEntry('ARRIVE_WORK')} animated='fade'>
+          <Button.Content visible>Arrive Work</Button.Content>
+          <Button.Content hidden>{moment().format('hh:mm a')}</Button.Content>
+        </Button>
+        <Button icon>
           <Icon name='building' />
         </Button>
-        <Button onClick={() => addEntry('LEAVE_WORK')}>Leave Work</Button>
+        <Button onClick={() => addEntry('LEAVE_WORK')} animated='fade'>
+          <Button.Content visible>Leave Work</Button.Content>
+          <Button.Content hidden>{moment().format('hh:mm a')}</Button.Content>
+        </Button>
       </Button.Group>
 
       <div className='entries'>
