@@ -8,14 +8,15 @@ interface Props {
 const secret = process.env.REACT_APP_LOGIN_CODE;
 
 export const Login: React.FC<Props> = ({ setIsLoggedIn }) => {
-  const [loginCode, setLoginCode] = useState('');
-  const checkLoginCode = (code: string) => {
-    loginCode === secret ? setIsLoggedIn(true) : setIsLoggedIn(false);
-  };
+  console.log('Login Disabled');
+  const [loginCode, setLoginCode] = useState('anker');
 
   useEffect(() => {
+    const checkLoginCode = (code: string) => {
+      loginCode === secret ? setIsLoggedIn(true) : setIsLoggedIn(false);
+    };
     checkLoginCode(loginCode);
-  }, [loginCode]);
+  }, [loginCode, setIsLoggedIn]);
   return (
     <Segment>
       <Input
