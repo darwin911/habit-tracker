@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Icon } from 'semantic-ui-react';
-// import moment from 'moment';
+import { Button, Icon, Divider } from 'semantic-ui-react';
+import moment from 'moment';
 import firebase from '../firebase';
 import { Entry } from './Entry';
 
@@ -8,56 +8,65 @@ interface Props {}
 
 interface NewEntry {
   action: string;
-  timestamp: firebase.firestore.Timestamp;
+  timestamp: number;
   day: number;
   month: number;
   year: number;
+  dayOfYear: number;
 }
 
 interface DatabaseEntry {
   id: string;
   action: string;
-  timestamp: firebase.firestore.Timestamp;
+  timestamp: number;
   day: number;
   month: number;
   year: number;
+  dayOfYear: number;
 }
 
+const today = moment()
+  .startOf('day')
+  .dayOfYear();
+
 const useEntries = () => {
-  const [allEntries, setAllEntries] = useState();
+  const [todaysEntries, setTodaysEntries] = useState();
+
   useEffect(() => {
-    firebase
+    const unsubscribe = firebase
       .firestore()
       .collection('entries')
+      .where('dayOfYear', '==', today)
       .onSnapshot(snapshot => {
         const newEntries = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
 
-        setAllEntries(newEntries);
+        setTodaysEntries(newEntries);
       });
+
+    return () => unsubscribe();
   }, []);
 
-  return allEntries;
+  return todaysEntries;
 };
 
 export const TrackerContainer: React.FC<Props> = () => {
-  // const [homeLeaveTime, setHomeLeaveTime] = useState<null | string>(null);
   const entries = useEntries();
   console.log(typeof entries, entries);
 
   const addEntry = (action: string) => {
-    const firebaseTime = firebase.firestore.Timestamp.fromDate(new Date());
-    const now = new Date(firebaseTime.seconds * 1000).toDateString();
+    const date = new Date();
     const entry: NewEntry = {
       action,
-      timestamp: firebase.firestore.Timestamp.now(),
-      day: new Date().getDate(),
-      month: new Date().getMonth(),
-      year: new Date().getFullYear()
+      timestamp: Date.now(),
+      day: date.getDate(),
+      month: date.getMonth() + 1,
+      year: date.getFullYear(),
+      dayOfYear: today
     };
-    console.log(action);
+
     console.log(entry);
 
     firebase
@@ -68,22 +77,26 @@ export const TrackerContainer: React.FC<Props> = () => {
   };
 
   return (
-    <div>
+    <div style={{ maxWidth: 300, margin: '0 auto' }}>
       <h1>Hi Darwin!</h1>
       <h2>Today's entry: </h2>
-      <Button.Group vertical>
-        <Button onClick={() => addEntry('LEAVE_HOME')} positive>
-          Leave Home
+      <Button.Group fluid>
+        <Button onClick={() => addEntry('LEAVE_HOME')} animated='fade'>
+          <Button.Content visible>Leave Home</Button.Content>
+          <Button.Content hidden>{moment().format('hh:mm a')}</Button.Content>
         </Button>
-        <Button onClick={() => addEntry('ARRIVE_WORK')} positive>
-          Arrive Work
+        <Button icon color='green'>
+          <Icon name='home' />
         </Button>
-        <Button onClick={() => addEntry('LEAVE_WORK')} negative>
-          Leave Work
+        <Button onClick={() => addEntry('ARRIVE_HOME')}>Arrive Home</Button>
+      </Button.Group>
+      <Divider />
+      <Button.Group fluid>
+        <Button onClick={() => addEntry('ARRIVE_WORK')}>Arrive Work</Button>
+        <Button icon color='blue'>
+          <Icon name='building' />
         </Button>
-        <Button onClick={() => addEntry('ARRIVE_HOME')} negative>
-          Arrive Home
-        </Button>
+        <Button onClick={() => addEntry('LEAVE_WORK')}>Leave Work</Button>
       </Button.Group>
 
       <div className='entries'>
