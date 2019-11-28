@@ -1,29 +1,58 @@
 import React, { useState, useEffect } from 'react';
-import { Input, Segment } from 'semantic-ui-react';
+import { Form, Message } from 'semantic-ui-react';
+import firebase from '../firebase';
 
 interface Props {
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+  toggleLoginForm: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const secret = process.env.REACT_APP_LOGIN_CODE;
+interface ErrorCode {
+  code: string;
+  message: string;
+}
 
-export const Login: React.FC<Props> = ({ setIsLoggedIn }) => {
-  console.log('Login Disabled');
-  const [loginCode, setLoginCode] = useState('anker');
+export const Login: React.FC<Props> = ({ setIsLoggedIn, toggleLoginForm }) => {
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<ErrorCode | null>(null);
 
-  useEffect(() => {
-    const checkLoginCode = (code: string) => {
-      loginCode === secret ? setIsLoggedIn(true) : setIsLoggedIn(false);
-    };
-    checkLoginCode(loginCode);
-  }, [loginCode, setIsLoggedIn]);
+  const handleLogin = async () => {
+    setIsLoading(true);
+    console.log(email, password);
+
+    firebase
+      .auth()
+      .signInWithEmailAndPassword(email, password)
+      .then(thing => {
+        console.log(thing);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        setError(err);
+        console.log(err);
+        setIsLoading(false);
+      });
+  };
+
   return (
-    <Segment>
-      <Input
-        size='huge'
-        type='password'
-        onChange={e => setLoginCode(e.target.value)}
+    <Form loading={isLoading} error>
+      <Form.Input
+        type='Email'
+        placeholder='email'
+        onChange={e => setEmail(e.target.value)}
       />
-    </Segment>
+      <Form.Input
+        type='password'
+        placeholder='Password'
+        onChange={e => setPassword(e.target.value)}
+      />
+      <Form.Button onClick={handleLogin}>Login</Form.Button>
+      <Form.Button onClick={() => toggleLoginForm(val => !val)}>
+        Create Account
+      </Form.Button>
+      {error && <Message error header={error.code} content={error.message} />}
+    </Form>
   );
 };
