@@ -4,7 +4,17 @@ import moment from 'moment';
 import firebase from '../firebase';
 import { Entry } from './Entry';
 
-interface Props {}
+interface UserObject {
+  name: string | null | undefined;
+  email: string | null | undefined;
+  uid: string | undefined;
+}
+
+interface Props {
+  user: UserObject | null;
+  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+  setCurrentUser: React.Dispatch<React.SetStateAction<UserObject | null>>;
+}
 
 interface NewEntry {
   action: string;
@@ -52,7 +62,11 @@ const useEntries = () => {
   return todaysEntries;
 };
 
-export const TrackerContainer: React.FC<Props> = () => {
+export const TrackerContainer: React.FC<Props> = ({
+  user,
+  setIsLoggedIn,
+  setCurrentUser
+}) => {
   const entries = useEntries();
   console.log(typeof entries, entries);
 
@@ -76,9 +90,26 @@ export const TrackerContainer: React.FC<Props> = () => {
       .catch(err => console.log(err));
   };
 
+  const handleLogout = () => {
+    firebase
+      .auth()
+      .signOut()
+      .then(
+        () => {
+          console.log('Signed Out');
+          setIsLoggedIn(false);
+          setCurrentUser(null);
+        },
+        function(error) {
+          console.error('Sign Out Error', error);
+        }
+      );
+  };
+
   return (
     <div style={{ maxWidth: 600, margin: '0 auto' }}>
-      <h1>Hi Darwin!</h1>
+      <Button onClick={handleLogout}>Logout</Button>
+      <h1>Hello {user && user.name ? user.name : 'Human'}!</h1>
       <h2>Today's entry: </h2>
       <Button.Group fluid>
         <Button onClick={() => addEntry('LEAVE_HOME')} animated='fade'>
