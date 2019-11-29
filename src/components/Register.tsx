@@ -16,6 +16,7 @@ export const Register: React.FC<Props> = ({
   setIsLoggedIn,
   toggleLoginForm
 }) => {
+  const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -27,7 +28,7 @@ export const Register: React.FC<Props> = ({
 
     firebase
       .auth()
-      .signInWithEmailAndPassword(email, password)
+      .createUserWithEmailAndPassword(email, password)
       .then(thing => {
         console.log(thing);
         setIsLoading(false);
@@ -42,8 +43,13 @@ export const Register: React.FC<Props> = ({
   return (
     <Form loading={isLoading} error>
       <Form.Input
+        type='text'
+        placeholder='Carl Sagan'
+        onChange={e => setName(e.target.value)}
+      />
+      <Form.Input
         type='Email'
-        placeholder='email'
+        placeholder='user@email.com'
         onChange={e => setEmail(e.target.value)}
       />
       <Form.Input
