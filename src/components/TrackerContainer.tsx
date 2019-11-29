@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Icon, Input } from 'semantic-ui-react';
+import { Button, Icon, Input, Message } from 'semantic-ui-react';
 import moment from 'moment';
 import firebase from '../firebase';
 import { Entry } from './Entry';
@@ -67,14 +67,40 @@ const useEntries = () => {
   return todaysEntries;
 };
 
+const useActivities = () => {
+  const [userActivities, setUserActivities] = useState();
+
+  useEffect(() => {
+    const user = firebase.auth().currentUser;
+    if (user) {
+      const unsubscribe = firebase
+        .firestore()
+        .collection('user_activities')
+        .doc(user.uid)
+        .onSnapshot(snapshot => {
+          const allActivities = snapshot.data();
+          if (allActivities) {
+            setUserActivities(allActivities.activities);
+          }
+        });
+      return () => unsubscribe();
+    }
+  }, []);
+
+  return userActivities;
+};
+
 export const TrackerContainer: React.FC<Props> = ({
   user,
   setIsLoggedIn,
   setCurrentUser
 }) => {
-  const [newActivityName, setnewActivityName] = useState<string>('');
+  const [newActivityName, setNewActivityName] = useState<string>('');
+  const [isDuplicateActivity, setIsDuplicateActivity] = useState<boolean>(
+    false
+  );
   const entries = useEntries();
-  console.log(typeof entries, entries);
+  const activities = useActivities();
 
   const addEntry = (action: string) => {
     if (user) {
@@ -120,12 +146,28 @@ export const TrackerContainer: React.FC<Props> = ({
 
   const createActivity = () => {
     console.log('create activity', newActivityName);
+
     if (user) {
       // find user
       const activitiesRef = userActivitiesRef.doc(user.uid);
       activitiesRef.update({
         activities: firebase.firestore.FieldValue.arrayUnion(newActivityName)
       });
+    }
+    setNewActivityName('');
+  };
+
+  const handleNewActivity = (activityName: string) => {
+    setNewActivityName(activityName);
+    if (
+      activities.some(
+        (activity: string) =>
+          activity.toLowerCase() === activityName.toLowerCase()
+      )
+    ) {
+      setIsDuplicateActivity(true);
+    } else {
+      setIsDuplicateActivity(false);
     }
   };
 
@@ -135,10 +177,21 @@ export const TrackerContainer: React.FC<Props> = ({
       <h1>Hello {user && user.name}!</h1>
       {/* <HomeWorkTracking addEntry={addEntry} /> */}
       <h2>Activities</h2>
+      <p>These are your currently tracked activities</p>
+      {activities &&
+        activities.map((activity: string, idx: number) => (
+          <p key={idx}>{activity}</p>
+        ))}
       <Input
         value={newActivityName}
-        onChange={e => setnewActivityName(e.target.value)}></Input>
-      <Button onClick={createActivity}>Add</Button>
+        onChange={e => handleNewActivity(e.target.value)}
+        error={isDuplicateActivity}></Input>
+      <Button onClick={createActivity} disabled={isDuplicateActivity}>
+        Add
+      </Button>
+      {isDuplicateActivity && (
+        <Message error>This activity name already exists</Message>
+      )}
 
       <h2>Today's entry: </h2>
       <div className='entries'>
