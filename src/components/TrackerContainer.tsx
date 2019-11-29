@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Icon, Divider } from 'semantic-ui-react';
+import { Button, Icon, Input } from 'semantic-ui-react';
 import moment from 'moment';
 import firebase from '../firebase';
 import { Entry } from './Entry';
+import { HomeWorkTracking } from './HomeWorkTracking';
 
 interface UserObject {
   name: string | null | undefined;
@@ -71,6 +72,7 @@ export const TrackerContainer: React.FC<Props> = ({
   setIsLoggedIn,
   setCurrentUser
 }) => {
+  const [newActivityName, setnewActivityName] = useState<string>('');
   const entries = useEntries();
   console.log(typeof entries, entries);
 
@@ -83,7 +85,7 @@ export const TrackerContainer: React.FC<Props> = ({
         action,
         timestamp: Date.now(),
         day: date.getDate(),
-        month: date.getMonth() + 1,
+        month: date.getMonth(),
         year: date.getFullYear(),
         dayOfYear: today
       };
@@ -114,39 +116,31 @@ export const TrackerContainer: React.FC<Props> = ({
       );
   };
 
+  const userActivitiesRef = firebase.firestore().collection('user_activities');
+
+  const createActivity = () => {
+    console.log('create activity', newActivityName);
+    if (user) {
+      // find user
+      const activitiesRef = userActivitiesRef.doc(user.uid);
+      activitiesRef.update({
+        activities: firebase.firestore.FieldValue.arrayUnion(newActivityName)
+      });
+    }
+  };
+
   return (
     <div style={{ width: 600, maxWidth: '90vw', margin: '0 auto' }}>
       <Button onClick={handleLogout}>Logout</Button>
       <h1>Hello {user && user.name}!</h1>
-      <h2>Today's entry: </h2>
-      <Button.Group fluid>
-        <Button onClick={() => addEntry('LEAVE_HOME')} animated='fade'>
-          <Button.Content visible>Leave Home</Button.Content>
-          <Button.Content hidden>{moment().format('hh:mm a')}</Button.Content>
-        </Button>
-        <Button icon>
-          <Icon name='home' />
-        </Button>
-        <Button onClick={() => addEntry('ARRIVE_HOME')} animated='fade'>
-          <Button.Content visible>Arrive Home</Button.Content>
-          <Button.Content hidden>{moment().format('hh:mm a')}</Button.Content>
-        </Button>
-      </Button.Group>
-      <Divider />
-      <Button.Group fluid>
-        <Button onClick={() => addEntry('ARRIVE_WORK')} animated='fade'>
-          <Button.Content visible>Arrive Work</Button.Content>
-          <Button.Content hidden>{moment().format('hh:mm a')}</Button.Content>
-        </Button>
-        <Button icon>
-          <Icon name='building' />
-        </Button>
-        <Button onClick={() => addEntry('LEAVE_WORK')} animated='fade'>
-          <Button.Content visible>Leave Work</Button.Content>
-          <Button.Content hidden>{moment().format('hh:mm a')}</Button.Content>
-        </Button>
-      </Button.Group>
+      {/* <HomeWorkTracking addEntry={addEntry} /> */}
+      <h2>Activities</h2>
+      <Input
+        value={newActivityName}
+        onChange={e => setnewActivityName(e.target.value)}></Input>
+      <Button onClick={createActivity}>Add</Button>
 
+      <h2>Today's entry: </h2>
       <div className='entries'>
         {entries ? (
           entries.map((entry: DatabaseEntry) => (
