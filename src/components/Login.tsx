@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Form, Message } from 'semantic-ui-react';
 import firebase from '../firebase';
 
@@ -18,20 +18,18 @@ export const Login: React.FC<Props> = ({ setIsLoggedIn, toggleLoginForm }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<ErrorCode | null>(null);
 
-  const handleLogin = async () => {
+  const handleLogin = () => {
     setIsLoading(true);
-    console.log(email, password);
 
     firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
-      .then(thing => {
-        console.log(thing);
+      .then(userCredential => {
         setIsLoading(false);
+        setIsLoggedIn(true);
       })
       .catch(err => {
         setError(err);
-        console.log(err);
         setIsLoading(false);
       });
   };
@@ -40,12 +38,13 @@ export const Login: React.FC<Props> = ({ setIsLoggedIn, toggleLoginForm }) => {
     <Form loading={isLoading} error>
       <Form.Input
         type='Email'
-        placeholder='email'
+        placeholder='user@email.com'
         onChange={e => setEmail(e.target.value)}
       />
       <Form.Input
         type='password'
         placeholder='Password'
+        min={6}
         onChange={e => setPassword(e.target.value)}
       />
       <Form.Button onClick={handleLogin}>Login</Form.Button>
