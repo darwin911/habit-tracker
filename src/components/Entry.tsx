@@ -19,14 +19,6 @@ export const Entry: React.FC<Props> = ({ entry }) => {
   const time = moment(entry.timestamp).format('hh:mm:ss a');
   return (
     <Table className='entry' celled collapsing>
-      <Table.Header>
-        <Table.Row>
-          <Table.HeaderCell>Time</Table.HeaderCell>
-          <Table.HeaderCell>Action</Table.HeaderCell>
-          <Table.HeaderCell>Date</Table.HeaderCell>
-        </Table.Row>
-      </Table.Header>
-
       <Table.Body>
         <Table.Row>
           <Table.Cell>
@@ -34,7 +26,7 @@ export const Entry: React.FC<Props> = ({ entry }) => {
           </Table.Cell>
           <Table.Cell>{entry.action}</Table.Cell>
           <Table.Cell>
-            {entry.month}/{entry.day}/{entry.year}
+            {entry.month + 1}/{entry.day}/{entry.year}
           </Table.Cell>
         </Table.Row>
       </Table.Body>
