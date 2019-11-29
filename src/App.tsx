@@ -37,6 +37,7 @@ const App: React.FC = () => {
 
   return (
     <div className='App'>
+      <h1>Habit Tracker</h1>
       {isLoggedIn && currentUser ? (
         <TrackerContainer
           user={currentUser}
