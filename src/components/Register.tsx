@@ -42,6 +42,14 @@ export const Register: React.FC<Props> = ({
               displayName: name
             })
             .then(() => {
+              firebase
+                .firestore()
+                .collection('user_activities')
+                .doc(user.uid)
+                .set({
+                  activities: []
+                });
+
               setCurrentUser({
                 name: user.displayName,
                 email: user.email,
