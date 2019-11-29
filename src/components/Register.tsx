@@ -9,7 +9,6 @@ interface UserObject {
 }
 
 interface Props {
-  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
   toggleLoginForm: React.Dispatch<React.SetStateAction<boolean>>;
   setCurrentUser: React.Dispatch<React.SetStateAction<UserObject | null>>;
 }
@@ -20,7 +19,6 @@ interface ErrorCode {
 }
 
 export const Register: React.FC<Props> = ({
-  setIsLoggedIn,
   toggleLoginForm,
   setCurrentUser
 }) => {

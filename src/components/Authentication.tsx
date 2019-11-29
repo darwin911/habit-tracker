@@ -28,7 +28,6 @@ export const Authentication: React.FC<Props> = ({
         />
       ) : (
         <Register
-          setIsLoggedIn={setIsLoggedIn}
           toggleLoginForm={toggleLoginForm}
           setCurrentUser={setCurrentUser}
         />
