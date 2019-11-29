@@ -2,11 +2,21 @@ import React, { useState } from 'react';
 import { Login } from './Login';
 import { Register } from './Register';
 
-interface Props {
-  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+interface UserObject {
+  name: string | null | undefined;
+  email: string | null | undefined;
+  uid: string | undefined;
 }
 
-export const Authentication: React.FC<Props> = ({ setIsLoggedIn }) => {
+interface Props {
+  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+  setCurrentUser: React.Dispatch<React.SetStateAction<UserObject | null>>;
+}
+
+export const Authentication: React.FC<Props> = ({
+  setIsLoggedIn,
+  setCurrentUser
+}) => {
   const [loginForm, toggleLoginForm] = useState<boolean>(true);
   return (
     <div className='authentication'>
@@ -20,6 +30,7 @@ export const Authentication: React.FC<Props> = ({ setIsLoggedIn }) => {
         <Register
           setIsLoggedIn={setIsLoggedIn}
           toggleLoginForm={toggleLoginForm}
+          setCurrentUser={setCurrentUser}
         />
       )}
     </div>

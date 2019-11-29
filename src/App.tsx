@@ -45,7 +45,10 @@ const App: React.FC = () => {
         />
       ) : (
         <>
-          <Authentication setIsLoggedIn={setIsLoggedIn} />
+          <Authentication
+            setIsLoggedIn={setIsLoggedIn}
+            setCurrentUser={setCurrentUser}
+          />
         </>
       )}
     </div>

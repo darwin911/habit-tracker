@@ -109,7 +109,7 @@ export const TrackerContainer: React.FC<Props> = ({
   return (
     <div style={{ maxWidth: 600, margin: '0 auto' }}>
       <Button onClick={handleLogout}>Logout</Button>
-      <h1>Hello {user && user.name ? user.name : 'Human'}!</h1>
+      <h1>Hello {user && user.name}!</h1>
       <h2>Today's entry: </h2>
       <Button.Group fluid>
         <Button onClick={() => addEntry('LEAVE_HOME')} animated='fade'>

@@ -2,9 +2,16 @@ import React, { useState } from 'react';
 import { Form, Message } from 'semantic-ui-react';
 import firebase from '../firebase';
 
+interface UserObject {
+  name: string | null | undefined;
+  email: string | null | undefined;
+  uid: string | undefined;
+}
+
 interface Props {
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
   toggleLoginForm: React.Dispatch<React.SetStateAction<boolean>>;
+  setCurrentUser: React.Dispatch<React.SetStateAction<UserObject | null>>;
 }
 
 interface ErrorCode {
@@ -14,7 +21,8 @@ interface ErrorCode {
 
 export const Register: React.FC<Props> = ({
   setIsLoggedIn,
-  toggleLoginForm
+  toggleLoginForm,
+  setCurrentUser
 }) => {
   const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
@@ -22,22 +30,35 @@ export const Register: React.FC<Props> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<ErrorCode | null>(null);
 
-  const handleRegister = async () => {
+  const handleRegister = () => {
     setIsLoading(true);
-    console.log(email, password);
 
     firebase
       .auth()
       .createUserWithEmailAndPassword(email, password)
-      .then(thing => {
-        console.log(thing);
-        setIsLoading(false);
+      .then(data => {
+        const { user } = data;
+        if (user) {
+          user
+            .updateProfile({
+              displayName: name
+            })
+            .then(() => {
+              setCurrentUser({
+                name: user.displayName,
+                email: user.email,
+                uid: user.uid
+              });
+            });
+        }
       })
       .catch(err => {
         setError(err);
         console.log(err);
         setIsLoading(false);
       });
+
+    setIsLoading(false);
   };
 
   return (
